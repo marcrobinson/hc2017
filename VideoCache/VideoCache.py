@@ -1,4 +1,4 @@
-import os
+﻿import os
 
 class VideoCache:
     def __init__(self, filename):
@@ -85,6 +85,21 @@ class RequestDescrption:
         self.video = video
         self.endpoint = endpoint
         self.num_of_requests = num_of_requests
+
+def simple_packing(weights, capacity):
+    """
+    weights: sorted weights that we want to pack into the capacity space
+    """
+       new_cap = capacity
+
+       for weight in weights:
+           if weight < new_cap:
+               packer.append(weight)
+               new_cap -= weight
+       packed = []
+
+       return packed
+
 
 if __name__ == "__main__":
     proc = VideoCache(os.path.join("input", "me_at_the_zoo.in"))
