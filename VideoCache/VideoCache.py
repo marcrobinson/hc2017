@@ -1,5 +1,7 @@
 ﻿import os
 
+from cache_server import CacheServer
+
 class VideoCache:
     def __init__(self, filename):
         self.filename = filename
@@ -59,9 +61,7 @@ class VideoCache:
 class DataModel:
     pass
 
-class CacheServer():
-    def __init__(self, ID):
-        self.ID = ID
+
 
 class Video:
     def __init__(self, ID, size):
@@ -69,10 +69,19 @@ class Video:
         self.size = size
 
 class Endpoint:
-    def __init__(self, ID, data_center_latency, num_of_cache_servers):
+    def __init__(self, ID, data_center_latency):
         self.ID = ID
         self.data_center_latency = data_center_latency
-        self.num_of_cache_servers = num_of_cache_servers 
+        self.cache_server_connections = []
+
+    def get_connection(self, cs):
+        for conn in self.cache_server_connections:
+            if(cs == conn.cache_server):
+                return conn
+        else:
+            return None
+
+
 
 class CacheServerConnection:
     def __init__(self, cache_server, endpoint, cache_server_latency):
