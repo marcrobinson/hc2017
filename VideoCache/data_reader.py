@@ -1,6 +1,13 @@
-import os
+import os, numpy
+from VideoCache import time_saved_calculator
 
+from end_point import Endpoint
 from cache_server import CacheServer
+from cache_server_connection import CacheServerConnection
+import time_saved_calculator
+from video import Video
+from request_description import RequestDescrption
+
 
 class VideoCache:
     def __init__(self, filename):
@@ -39,7 +46,7 @@ class VideoCache:
 
         for i in range(self.num_of_endpoints):
             data_center_latency, num_of_cache_servers = self.get_next_line_list()
-            endpoint = Endpoint(i, data_center_latency, num_of_cache_servers)
+            endpoint = Endpoint(i, data_center_latency)
             endpoint.cache_server_connections = []
             for i in range(num_of_cache_servers):
                 cache_server_ID, cache_server_latency = self.get_next_line_list()
@@ -58,44 +65,26 @@ class VideoCache:
 
         return data_model
 
-class DataModel:
-    pass
-
-
-
-class Video:
-    def __init__(self, ID, size):
-        self.ID = ID
-        self.size = size
-
-class Endpoint:
-    def __init__(self, ID, data_center_latency):
-        self.ID = ID
-        self.data_center_latency = data_center_latency
-        self.cache_server_connections = []
-
-    def get_connection(self, cs):
-        for conn in self.cache_server_connections:
-            if(cs == conn.cache_server):
-                return conn
-        else:
-            return None
-
-
-
-class CacheServerConnection:
-    def __init__(self, cache_server, endpoint, cache_server_latency):
-        self.cache_server = cache_server
-        self.endpoint = endpoint
-        self.latency = cache_server_latency
-
-class RequestDescrption:
-    def __init__(self, video, endpoint, num_of_requests):
-        self.video = video
-        self.endpoint = endpoint
-        self.num_of_requests = num_of_requests
 
 if __name__ == "__main__":
     proc = VideoCache(os.path.join("input", "me_at_the_zoo.in"))
     data_model = proc.get_data_model()
-    print("")
+
+    cs_video_val = time_saved_calculator.calc_benefit(data_model.request_descriptions, data_model.videos, data_model.cache_servers)
+
+
+
+    print(cs_video_val)
+
+    print("*********")
+
+    print(numpy.sort(cs_video_val))
+
+    print(numpy.argsort(cs_video_val))
+
+
+
+
+
+
+
