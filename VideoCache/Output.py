@@ -1,4 +1,4 @@
-﻿from VideoCache import *
+﻿from data_reader import *
 
 class Output(object):
     
@@ -8,7 +8,7 @@ class Output(object):
     def set_cache_list(self, cache_servers):
         self.cache_servers = cache_servers
 
-    def output_file_data(self):
+    def write(self):
         file = open(self.filename, "w")
 
         file.write(str(len(self.cache_servers)) + "\n")

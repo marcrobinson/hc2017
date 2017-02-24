@@ -1,6 +1,6 @@
 import unittest
 from VideoCache import time_saved_calculator
-from VideoCache.VideoCache import Video, CacheServer, CacheServerConnection, Endpoint, RequestDescrption
+from VideoCache.data_reader import Video, CacheServer, CacheServerConnection, Endpoint, RequestDescrption
 
 
 class MyTestCase(unittest.TestCase):
@@ -14,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         my_endpoint.cache_server_connections.append(my_connection)
         my_request = RequestDescrption(my_video, my_endpoint, 1)
 
-        time_saved = time_saved_calculator.calculate_time_saved([my_request])
+        time_saved,total_requests = time_saved_calculator.calculate_time_saved([my_request])
 
         self.assertEqual(0, time_saved)
 
@@ -30,7 +30,7 @@ class MyTestCase(unittest.TestCase):
 
         my_request = RequestDescrption(my_video, my_endpoint, 1)
 
-        score = time_saved_calculator.calculate_time_saved([my_request])
+        score,total_requests = time_saved_calculator.calculate_time_saved([my_request])
 
         self.assertEqual(10, score)
 
@@ -46,7 +46,7 @@ class MyTestCase(unittest.TestCase):
 
         my_request = RequestDescrption(my_video, my_endpoint, 1)
 
-        score = time_saved_calculator.calculate_time_saved([my_request])
+        score,total_requests = time_saved_calculator.calculate_time_saved([my_request])
 
         #self.assertEqual(10, score)
         cs_video_val = time_saved_calculator.calc_benefit([my_request],[my_video,],[my_cache_server])
