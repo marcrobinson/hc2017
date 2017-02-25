@@ -52,6 +52,7 @@ class DataReader:
                 cache_server = self.cache_servers[cache_server_ID]
                 cache_server_connection = CacheServerConnection(cache_server, endpoint, cache_server_latency)
                 endpoint.cache_server_connections.append(cache_server_connection)
+                cache_server.cache_server_connections.append(cache_server_connection)
 #                endpoint.cache_server_connections_hash[cache_server]=cache_server_connection
             self.endpoints.append(endpoint)
 

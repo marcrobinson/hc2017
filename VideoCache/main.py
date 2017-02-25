@@ -9,6 +9,9 @@ import numpy,os
 class Strategy():
     MOST_TIME_SAVED_FIRST="most_time_saved"
     PACKING="packing"
+    FACTOR_SIZE="factor_size"
+
+
 
 
 def put_videos_in_server(time_saved, video_size, server_capacity):
@@ -53,6 +56,39 @@ def put_most_time_saved_first(time_saved, video_size, server_capacity):
 
     return total_time_saved, out_ids
 
+def put_video_factor_size(time_saved, video_size, server_capacity):
+    '''
+    return video ids that by putting most time savd first,
+    does not consider packing into server capacity
+
+    :param time_saved:
+    :param video_size:
+    :param server_capacity:
+    :return:
+    '''
+
+    sorted_video_index = numpy.argsort(time_saved/video_size)[::-1]
+    out_ids = []
+
+    space = server_capacity
+
+    total_time_saved = 0
+
+    for vid in sorted_video_index:
+        if(space>=video_size[vid]):
+            out_ids.append(vid)
+            space -= video_size[vid]
+            total_time_saved+=time_saved[vid]
+
+        if(space<=0):
+            break
+
+    return total_time_saved, out_ids
+
+
+sort_methods = {}
+sort_methods[Strategy.FACTOR_SIZE] = put_video_factor_size
+sort_methods[Strategy.MOST_TIME_SAVED_FIRST] = put_most_time_saved_first
 
 def main():
     '''
@@ -74,6 +110,9 @@ def main():
     "me_at_the_zoo",
     "as",
     "trending_today"]
+
+    fname = [
+              "me_at_the_zoo",]
 
     strategy = Strategy.MOST_TIME_SAVED_FIRST
 
@@ -101,24 +140,30 @@ def calc_video_locations(fname, strategy):
     print("{0} time for matrix calc {1}".format(fname, time.time()- stime))
     stime = time.time()
 
+    # recalc the matrix each time video is added to server
+
+    # for i in range(0,10000):
+    #
+    #
+    #
+    #     sid, id = numpy.unravel_index(numpy.argmax(time_saving_matrix),time_saving_matrix.shape)
+    #
+    #     server = [s for s in reader.cache_servers if s.ID==sid][0]
+    #
+    #     server.add_video(reader.videos[id])
+    #
+    #     time_saving_matrix = calc_time_saved_matrix(reader.request_descriptions,
+    #                                                 reader.videos,
+    #                                                 reader.cache_servers)
+
     total_time_saved = 0
     for server in reader.cache_servers:
         # sort by time saving
         times = time_saving_matrix[server.ID]
 
-        if (strategy == Strategy.MOST_TIME_SAVED_FIRST):
-            time_saved, video_ids = put_most_time_saved_first(times,
+        time_saved, video_ids = sort_methods[strategy](times,
                                                   video_sizes,
                                                   server.capacity)
-
-        # time_per_size = times/video_sizes
-        #
-        # video_ids2 = numpy.argsort(time_per_size)[::-1]
-        #
-        # #sorted_t = numpy.sort(times)[::-1]
-        # video_ids = numpy.argsort(times)[::-1]
-
-        # here could calculate times per video size
 
         total_time_saved+=time_saved
 
@@ -134,14 +179,16 @@ def calc_video_locations(fname, strategy):
     print("{0} time for output {1}".format(fname, time.time()- stime))
     stime = time.time()
 
-    #time_saved, total_requests = calculate_time_saved(reader.request_descriptions)
+    total_time_saved2, total_requests2 = calculate_time_saved(reader.request_descriptions)
+    score2 = total_time_saved2 / total_requests2 * 1000
+    print(fname + " actual total time saved " + str(total_time_saved2))
+    print(fname + " actual score " + str(score2))
 
-    total_requests = sum([nreq.num_of_requests for nreq in reader.request_descriptions])
-
-    score = total_time_saved / total_requests * 1000
-
-    print(fname+" "+str(time_saved))
-    print(fname+" "+str(score))
+    # total_requests = sum([nreq.num_of_requests for nreq in reader.request_descriptions])
+    # score = total_time_saved / total_requests * 1000
+    #
+    # print(fname+" "+str(total_time_saved))
+    # print(fname+" "+str(score))
 
     print("{0} time check time saved {1}".format(fname, time.time()- stime))
     stime = time.time()
